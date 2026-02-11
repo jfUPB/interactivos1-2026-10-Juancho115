@@ -8,7 +8,7 @@
 <img width="489" height="485" alt="image" src="https://github.com/user-attachments/assets/d990636a-b624-486c-81c0-805da531ff97" />
 
 
-### a
+### Actividad 3
 ```
 from microbit import *
 import utime
@@ -115,5 +115,145 @@ while True:
         
     semaforo1.update()
     utime.sleep_ms(20)
-``` 
+```
+
+### Actividad 04 
+```python
+from microbit import *
+import utime
+import music
+
+
+def make_fill_images(on='9', off='0'):
+    imgs = []
+    for n in range(26):
+        rows = []
+        k = 0
+        for _ in range(5):
+            row = []
+            for _ in range(5):
+                row.append(on if k < n else off)
+                k += 1
+            rows.append(''.join(row))
+        imgs.append(Image(':'.join(rows)))
+    return imgs
+
+
+class Timer:
+    def __init__(self, owner, event_to_post, duration):
+        self.owner = owner
+        self.event = event_to_post
+        self.duration = duration
+        self.start_time = 0
+        self.active = False
+
+    def start(self):
+        self.start_time = utime.ticks_ms()
+        self.active = True
+
+    def stop(self):
+        self.active = False
+
+    def update(self):
+        if self.active:
+            if utime.ticks_diff(utime.ticks_ms(), self.start_time) >= self.duration:
+                self.active = False
+                self.owner.post_event(self.event)
+
+
+class Task:
+    def __init__(self):
+        self.event_queue = []
+        self.timers = []
+
+        self.timer = self.createTimer("Timeout", 1000)
+
+        self.imgs = make_fill_images()
+        self.tiempo = 20   # 20 pixeles = 20 segundos
+
+        self.estado_actual = None
+        self.transicion_a(self.estado_config)
+
+    def createTimer(self, event, duration):
+        t = Timer(self, event, duration)
+        self.timers.append(t)
+        return t
+
+    def post_event(self, ev):
+        self.event_queue.append(ev)
+
+    def update(self):
+        for t in self.timers:
+            t.update()
+
+        while len(self.event_queue) > 0:
+            ev = self.event_queue.pop(0)
+            if self.estado_actual:
+                self.estado_actual(ev)
+
+    def transicion_a(self, nuevo_estado):
+        if self.estado_actual:
+            self.estado_actual("EXIT")
+        self.estado_actual = nuevo_estado
+        self.estado_actual("ENTRY")
+
+    def estado_config(self, ev):
+        if ev == "ENTRY":
+            display.show(self.imgs[self.tiempo])
+
+        if ev == "A" and self.tiempo > 15:
+            self.tiempo -= 1
+            display.show(self.imgs[self.tiempo])
+
+        if ev == "B" and self.tiempo < 25:
+            self.tiempo += 1
+            display.show(self.imgs[self.tiempo])
+
+        if ev == "S":
+            self.transicion_a(self.estado_cuenta)
+            music.play(music.ENTERTAINER)
+
+    def estado_cuenta(self, ev):
+        if ev == "ENTRY":
+            self.timer.start()
+
+        if ev == "Timeout":
+            self.tiempo -= 1
+            display.show(self.imgs[self.tiempo])
+
+            if self.tiempo <= 0:
+                self.transicion_a(self.estado_explosion)
+            else:
+                self.timer.start()
+
+        if ev == "EXIT":
+            self.timer.stop()
+
+    def estado_explosion(self, ev):
+        if ev == "ENTRY":
+            display.show(Image.SKULL)
+            music.play(music.DADADADUM)
+
+        if ev == "A" or ev == "B" or ev == "S":
+            self.tiempo = 20
+            self.transicion_a(self.estado_config)
+
+
+task = Task()
+
+while True:
+    if button_a.was_pressed():
+        task.post_event("A")
+    if button_b.was_pressed():
+        task.post_event("B")
+    if accelerometer.was_gesture("shake"):
+        task.post_event("S")
+
+    task.update()
+    utime.sleep_ms(20)
+```
+<img width="492" height="396" alt="image" src="https://github.com/user-attachments/assets/ff6ec8fc-0bb6-4c9d-a551-35673ee0560e" />
+
+
 ## Bitácora de reflexión
+
