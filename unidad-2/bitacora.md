@@ -9,7 +9,7 @@
 
 
 ### Actividad 3
-```
+```python
 from microbit import *
 import utime
 
@@ -256,4 +256,7 @@ while True:
 
 
 ## Bitácora de reflexión
+
+### Actividad 05
+
 
