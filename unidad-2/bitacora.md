@@ -259,4 +259,73 @@ while True:
 
 ### Actividad 05
 
+- El reto lo resolví basandome en actividades anteriores en la que se uso el p5.js y agregué en el codigo del microbit una parte para que el p5.js reconozca los inputs que equivalen a lo que se necesita y en el p5.js ademas de agregar un canva de instrucciones de como usar el microbit con el teclado hay una parte dedicada a la lectura del teclado y la interpretación de las teclas que se usan
+
+- Codigo en microbit
+```python
+uart.init(baudrate=115200)
+```
+
+  ```python
+   data = uart.read()
+
+    if data is not None:
+        for char in data.decode():
+            if char == "A":
+              task.post_event("A")
+            elif char == "B":
+              task.post_event("B")
+            elif char == "S":
+                task.post_event("S")
+  ``` 
+- Codigo p5.js
+
+```JAVASCRIPT
+let port;
+let connectBtn;
+
+function setup() {
+  createCanvas(400, 200);
+  textAlign(CENTER, CENTER);
+  textSize(16);
+  port = createSerial();
+  connectBtn = createButton('Connect to micro:bit');
+  connectBtn.position(130, 180);
+  connectBtn.mousePressed(connectToSerial);
+}
+
+function draw() {
+  background(30);
+  fill(255);
+
+  if (!port.opened()) {
+    text("Presiona el botón para conectar\n\nLuego usa:\nA = UP\nB = DOWN\nS = ARM", width/2, height/2);
+  } else {
+    text("Conectado ✅\n\nPresiona A, B o S", width/2, height/2);
+  }
+}
+
+function connectToSerial() {
+  if (!port.opened()) {
+    port.open(115200);
+  } else {
+    port.close();
+  }
+}
+
+
+function keyPressed() {
+  if (!port.opened()) return;
+
+  let k = key.toUpperCase();
+
+  if (k === "A" || k === "B" || k === "S") {
+    port.write(k);
+    console.log("Enviado:", k);
+  }
+}
+
+```
+
+
 
