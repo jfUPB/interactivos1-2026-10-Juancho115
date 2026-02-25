@@ -29,6 +29,72 @@ si escribes el inicio del comando y TAB muestra los codigos que se pueda tener e
 ### Actividad 4
 
 ```javascript
+const ENTRY = "ENTRY";
+const EXIT = "EXIT";
+
+class Timer {
+  constructor(owner, event, duration) {
+    this.owner = owner;
+    this.event = event;
+    this.duration = duration;
+    this.startTime = 0;
+    this.active = false;
+  }
+
+  start() {
+    this.startTime = millis();
+    this.active = true;
+  }
+
+  stop() {
+    this.active = false;
+  }
+
+  update() {
+    if (this.active && millis() - this.startTime >= this.duration) {
+      this.active = false;
+      this.owner.postEvent(this.event);
+    }
+  }
+}
+
+class FSMTask {
+  constructor() {
+    this.state = null;
+    this.timers = [];
+    this.eventQueue = [];
+  }
+
+  addTimer(event, duration) {
+    const t = new Timer(this, event, duration);
+    this.timers.push(t);
+    return t;
+  }
+
+  postEvent(ev) {
+    this.eventQueue.push(ev);
+  }
+
+  transitionTo(newState) {
+    if (this.state) this.state(EXIT);
+    this.state = newState;
+    this.state(ENTRY);
+  }
+
+  update() {
+    for (let t of this.timers) {
+      t.update();
+    }
+
+    while (this.eventQueue.length > 0) {
+      const ev = this.eventQueue.shift();
+      if (this.state) {
+        this.state(ev);
+      }
+    }
+  }
+}
+
 const TIMER_LIMITS = {
   min: 15,
   max: 25,
@@ -253,6 +319,7 @@ function windowResized() {
 ```
 
 ## Bitácora de reflexión
+
 
 
 
