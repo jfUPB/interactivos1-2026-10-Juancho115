@@ -159,9 +159,9 @@ function setup() {
 
   renderer.set(temporizador.estado_config, () => drawConfig(temporizador.configValue));
   renderer.set(temporizador.estado_armed, () => drawArmed(temporizador.remainingSeconds, temporizador.totalSeconds));
-  renderer.set(temporizador.estado_paused1, () => drawPaused(temporizador.remainingSeconds, temporizador.totalSeconds));
-  renderer.set(temporizador.estado_paused2, () => drawPaused(temporizador.remainingSeconds, temporizador.totalSeconds));
-  renderer.set(temporizador.estado_paused3, () => drawPaused(temporizador.remainingSeconds, temporizador.totalSeconds));
+  renderer.set(temporizador.estado_paused1, () => drawPaused1(temporizador.remainingSeconds, temporizador.totalSeconds));
+  renderer.set(temporizador.estado_paused2, () => drawPaused2(temporizador.remainingSeconds, temporizador.totalSeconds));
+  renderer.set(temporizador.estado_paused3, () => drawPaused3(temporizador.remainingSeconds, temporizador.totalSeconds));
   renderer.set(temporizador.estado_timeout, () => drawTimeout());
 }
 
@@ -199,8 +199,30 @@ function drawArmed(val, total) {
   text(val, width / 2, height / 2);
 }
 
-function drawPaused(val, total) {
-  background(30);
+function drawPaused1(val, total) {
+  background(30,0,0);
+
+  fill(255, 200, 0);
+  textSize(40);
+  text("PAUSA", width / 2, height / 2 - 120);
+
+  fill(255);
+  textSize(100);
+  text(val, width / 2, height / 2);
+}
+function drawPaused2(val, total) {
+  background(0,30,0);
+
+  fill(255, 200, 0);
+  textSize(40);
+  text("PAUSA", width / 2, height / 2 - 120);
+
+  fill(255);
+  textSize(100);
+  text(val, width / 2, height / 2);
+}
+function drawPaused3(val, total) {
+  background(0,0,30);
 
   fill(255, 200, 0);
   textSize(40);
@@ -231,5 +253,6 @@ function windowResized() {
 ```
 
 ## Bitácora de reflexión
+
 
 
